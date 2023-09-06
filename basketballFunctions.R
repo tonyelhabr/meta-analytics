@@ -1,3 +1,7 @@
+data_matrix <- function(x) {
+    dplyr::mutate(x, dplyr::across(dplyr::everything(), as.numeric))
+}
+
 ## Get bootstrap, within player variance and total variance
 getVariances <- function(totals, reps, seasons="2014", exclude=c()) {
     exclude <- c(exclude, "Name", "Tm")
@@ -15,6 +19,7 @@ getVariances <- function(totals, reps, seasons="2014", exclude=c()) {
         if(nrow(x) < 10) {
             vec <- c()
         } else{ 
+            # browser()
             vec <- apply(x, 2, function(w) var(w, na.rm=TRUE))
             vec["Name"] <- x$Name[1]
         }
@@ -22,22 +27,22 @@ getVariances <- function(totals, reps, seasons="2014", exclude=c()) {
     })
 
     ## Average bootstrap vars within a season
-    BV <- colMeans(data.matrix(bootstrapVars[, commonMetrics]), na.rm=TRUE)
-
+    BV <- colMeans(data_matrix(bootstrapVars[, commonMetrics]), na.rm=TRUE)
+    
     withinPlayerVar <- ddply(totals, .(Name), function(x) {
         vec <- apply(x, 2, function(w) var(w, na.rm=TRUE))
         vec["Name"] <- x$Name[1]
         vec
     })
-    WV <- colMeans(data.matrix(withinPlayerVar[, commonMetrics]), na.rm=TRUE)
+    WV <- colMeans(data_matrix(withinPlayerVar[, commonMetrics]), na.rm=TRUE)
     
-    intersectNames <- intersect(withinPlayerVar$Name, bootstrapVars$Name)
-    commonCols <- intersect(colnames(withinPlayerVar), colnames(bootstrapVars))
-    commonCols <- setdiff(commonCols, c("Name", "Year", "Tm"))
-    diffVars <-
-        data.matrix(withinPlayerVar[withinPlayerVar$Name %in% intersectNames, commonCols]) -
-        data.matrix(bootstrapVars[bootstrapVars$Name %in% intersectNames, commonCols])
-    DV <- colMeans(diffVars, na.rm=TRUE)[commonMetrics]
+    # intersectNames <- intersect(withinPlayerVar$Name, bootstrapVars$Name)
+    # commonCols <- intersect(colnames(withinPlayerVar), colnames(bootstrapVars))
+    # commonCols <- setdiff(commonCols, c("Name", "Year", "Tm"))
+    # diffVars <-
+    #     data_matrix(withinPlayerVar[withinPlayerVar$Name %in% intersectNames, commonCols]) -
+    #     data_matrix(bootstrapVars[bootstrapVars$Name %in% intersectNames, commonCols])
+    # DV <- colMeans(diffVars, na.rm=TRUE)[commonMetrics]
     
     discriminationScores <- 1 - BV / SV
     

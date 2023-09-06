@@ -35,25 +35,25 @@ load(file.path(dat.dir, "bballGamelogs2015.Rdata"))
 ## Verify correct reconstruction of season totals data
 ## from gamelog data 
 
-reconstructed <- bootstrap_season(gamelogs15, identity=TRUE)
-totals1415 <- zeros_removed[zeros_removed$Season==2014, ]
-totals1415 <- addThreeBetweenPlayer(totals1415)
-
-rnms <- intersect(paste(reconstructed$Name, reconstructed$Tm),
-                  paste(totals1415$Name, totals1415$Tm))
-
-idx1 <- match(rnms, paste(reconstructed$Name, reconstructed$Tm))
-idx2 <- match(rnms, paste(totals1415$Name, totals1415$Tm))
-intersection <- setdiff(intersect(colnames(reconstructed),
-                                  colnames(totals1415)),
-                        c("Tm", "Name"))
-for(metric in intersection) {
-    plot(reconstructed[idx1, metric],
-         totals1415[idx2, metric], main=metric)
-    abline(a=0, b=1)
-    
-    browser()
-}
+# reconstructed <- bootstrap_season(gamelogs15, identity=TRUE)
+# totals1415 <- zeros_removed[zeros_removed$Season==2014, ]
+# totals1415 <- addThreeBetweenPlayer(totals1415)
+# 
+# rnms <- intersect(paste(reconstructed$Name, reconstructed$Tm),
+#                   paste(totals1415$Name, totals1415$Tm))
+# 
+# idx1 <- match(rnms, paste(reconstructed$Name, reconstructed$Tm))
+# idx2 <- match(rnms, paste(totals1415$Name, totals1415$Tm))
+# intersection <- setdiff(intersect(colnames(reconstructed),
+#                                   colnames(totals1415)),
+#                         c("Tm", "Name"))
+# for(metric in intersection) {
+#     plot(reconstructed[idx1, metric, drop = TRUE],
+#          totals1415[idx2, metric, drop = TRUE], main=metric)
+#     abline(a=0, b=1)
+#     
+#     browser()
+# }
 
 
 ## At least 250 minutes, all players
@@ -77,7 +77,7 @@ repsList <- mclapply(1:nboot, function(x) {
 reps <- do.call(rbind, repsList)
 reps <- reps[reps$MP > minMP*3/4, ]
 reps[reps$Name %in% nathrees, c("3P%", "3P%SS")] <- NA
-save(reps, file=file.path(dat.dir, "basketballReps.Rdata"))
+# save(reps, file=file.path(dat.dir, "basketballReps.Rdata"))
 
 reps[["3P%"]][reps[["3PA"]] < 10] <- NA
 
